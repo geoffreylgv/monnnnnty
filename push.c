@@ -1,44 +1,114 @@
 #include "monty.h"
 
 /**
- * f_push - add node to the stack
- * @head: stack head
- * @counter: line_number
- * Return: no return
-*/
-void f_push(stack_t **head, unsigned int counter)
+ * _isdigit - verifie
+ * @str: string
+ * Return: int
+ */
+int _isdigit(char *str)
 {
-	int n, i = 0, flag = 0;
-
-	if (bus.arg)
+	int i;
+	for (i = 0; str[i] != '\0'; i++)
 	{
-		if (bus.arg[0] == '-')
-			i++;
-		for (; bus.arg[i] != '\0'; i++)
+		if (str[i] == '-' && i == 0)
 		{
-			if (bus.arg[i] > 57 || bus.arg[i] < 48)
-				flag = 1;
+			continue;
 		}
-		if (flag == 1)
+	if (isdigit(str[i]) == 0)
 		{
-			fprintf(stderr, "L%d: usage: push integer\n", counter);
-			fclose(bus.file);
-			free(bus.content);
-			free_stack(*head);
-			exit(EXIT_FAILURE);
+			return (-1);
 		}
 	}
-	else
+	return (1);
+}
+
+/**
+ * push - data saving
+ *
+ * @stack: data structure
+ * @line_number: data
+ */
+void push(stack_t **stack, unsigned int line_number)
+{
+	stack_t *new = malloc(sizeof(stack_t)), *current;
+	char *arg;
+	if (new == NULL)
 	{
-		fprintf(stderr, "L%d: usage: push integer\n", counter);
-		fclose(bus.file);
-		free(bus.content);
-		free_stack(*head);
+		fprintf(stderr, "Error: malloc failed\n");
 		exit(EXIT_FAILURE);
 	}
-	n = atoi(bus.arg);
-	if (bus.lifi == 0)
-		addnode(head, n);
+	arg = strtok(NULL, " \n\t\r");
+	if (arg == NULL || _isdigit(arg) == -1)
+	{
+		fprintf(stderr, "L%u: usage: push integer\n", line_number);
+		free(new);
+		exit(EXIT_FAILURE);
+	}
+	new->n = atoi(arg);
+	new->prev = NULL;
+	if (*stack == NULL)
+	{
+		new->next = NULL;
+		*stack = new;
+		return;
+	}
+	current = *stack;
+	new->next = current;
+	current->prev = new;
+	*stack = new;
+}
+
+/**
+ * _push - push for queue
+ * @stack: begin
+ * @line_number: line
+ */
+void _push(stack_t **stack, unsigned int line_number)
+{
+	stack_t *new = malloc(sizeof(stack_t)), *current;
+	char *arg;
+	if (new == NULL)
+	{
+		fprintf(stderr, "Error: malloc failed\n");
+		exit(EXIT_FAILURE);
+	}
+	arg = strtok(NULL, " \n\t\r");
+	if (arg == NULL || _isdigit(arg) == -1)
+	{
+		fprintf(stderr, "L%u: usage: push integer\n", line_number);
+		free(new);
+		exit(EXIT_FAILURE);
+	}
+	new->n = atoi(arg);
+	new->next = NULL;
+	if (*stack == NULL)
+	{
+		new->prev = NULL;
+		*stack = new;
+		return;
+	}
+	current = *stack;
+	while (current->next != NULL)
+	{
+		current = current->next;
+	}
+	current->next = new;
+	new->prev = current;
+}
+
+/**
+ * pusher - push for queue or stack
+ * @stack: begin
+ * @line_number: line
+ */
+void pusher(stack_t **stack, unsigned int line_number)
+{
+	if (status == STACK)
+	{
+		push(stack, line_number);
+	}
 	else
-		addqueue(head, n);
+	{
+		_push(stack, line_number);
+	}
 }

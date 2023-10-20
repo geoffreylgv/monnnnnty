@@ -8,46 +8,25 @@
 * @content: line content
 * Return: nothing
 */
-int execute(char *content, stack_t **stack, unsigned int counter, FILE *file)
+void execute(char *arg, stack_t **stack, unsigned int line_number)
 {
-	instruction_t opst[] = {
-				{"push", f_push}, {"pall", f_pall}, {"pint", f_pint},
-				{"pop", f_pop},
-				{"swap", f_swap},
-				{"add", f_add},
-				{"nop", f_nop},
-				{"sub", f_sub},
-				{"div", f_div},
-				{"mul", f_mul},
-				{"mod", f_mod},
-				{"pchar", f_pchar},
-				{"pstr", f_pstr},
-				{"rotl", f_rotl},
-				{"rotr", f_rotr},
-				{"queue", f_queue},
-				{"stack", f_stack},
-				{NULL, NULL}
-				};
-	unsigned int i = 0;
-	char *opt;
-
-	opt = strtok(content, " \n\t");
-	if (opt && opt[0] == '#')
-		return (0);
-	bus.arg = strtok(NULL, " \n\t");
-	while (opst[i].opcode && opt)
+	instruction_t op[] = {
+		{"push", pusher}, {"pall", pall}, {"pint", pint},
+		{"pop", pop}, {"swap", swap}, {"add", add},
+		{"nop", nop}, {"sub", _sub}, {"div", _div},
+		{"mod", mod}, {"pchar", pchar}, {"pstr", pstr},
+		{"rotl", rotl}, {"rotr", rotr}, {"mul", mul},
+		{NULL, NULL}
+	};
+	int i;
+	for (i = 0; op[i].opcode != NULL; i++)
 	{
-		if (strcmp(opt, opst[i].opcode) == 0)
-		{	opst[i].f(stack, counter);
-			return (0);
+		if (strcmp(op[i].opcode, arg) == 0)
+		{
+			op[i].f(stack, line_number);
+			return;
 		}
-		i++;
 	}
-	if (opt && opst[i].opcode == NULL)
-	{ fprintf(stderr, "L%d: unknown instruction %s\n", counter, opt);
-		fclose(file);
-		free(content);
-		free_stack(*stack);
-		exit(EXIT_FAILURE); }
-	return (1);
+	fprintf(stderr, "L%u: unknown instruction %s\n", line_number, arg);
+	exit(EXIT_FAILURE);
 }

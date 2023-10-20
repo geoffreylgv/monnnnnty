@@ -1,13 +1,12 @@
 #include "monty.h"
 
 /**
-  *f_nop- nothing
-  *@head: stack head
-  *@counter: line_number
-  *Return: nothing
+ * nop - permutation first and last place
+ * @stack: begin
+ * @line_number: line
  */
-void f_nop(stack_t **head, unsigned int counter)
+void nop(stack_t **stack __attribute__((unused)),
+unsigned int line_number __attribute__((unused)))
 {
-	(void) counter;
-	(void) head;
+
 }
